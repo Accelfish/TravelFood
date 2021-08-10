@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-tw">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>農村小吃</title>
+    <link rel="stylesheet" href="style/index.css" />
+  </head>
+  <body>
+    <div class="wrapper container mx-auto">
+      <div class="loading js-hidden" id="Loading">
+        <div class="loading__loader"></div>
+        <div class="loading__message">資料下載中...請稍後</div>
+      </div>
+      <main class="container__row container__row--stack tf">
+        <div class="tf__title text-center">
+          <h1>農村地方美食小吃特色料理</h1>
+        </div>
+        <div class="container__row">
+          <div class="tf__col tf__col--main">
+            <table class="tf__table">
+              <thead class="tf__head">
+                <tr>
+                  <th class="tf__tit" title="編號">編號</th>
+                  <th class="tf__tit" title="行政區">行政區</th>
+                  <th class="tf__tit" title="圖片">圖片</th>
+                  <th class="tf__tit" title="名稱">名稱</th>
+                  <th class="tf__tit" title="介紹">介紹</th>
+                </tr>
+              </thead>
+              <tbody class="tf__body" id="TfBody"></tbody>
+            </table>
+          </div>
+          <div class="tf__col tf__col--aside">
+            <ul class="tf__pagination js-hidden" id="Pagination">
+              <li class="tf__pageItem--active">1</li>
+            </ul>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="js/index.js"></script>
+  </body>
+</html>
