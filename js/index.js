@@ -96,6 +96,7 @@ class TravelFood {
   setPageItemEvent() {
     let vm = this;
     const pageItemDOM = [...vm.pageItems];
+    const paginationDOM = vm.pagination;
     pageItemDOM.forEach(element => {
       element.addEventListener('click', function(){
         let currentPageNumber = vm.getCurrentPage();
@@ -139,7 +140,7 @@ class TravelFood {
     }
 
     vm.pagination.innerHTML = template;
-    vm.pageItems = vm.pagination.querySelectorAll('tf__pageItem');
+    vm.pageItems = vm.pagination.querySelectorAll('.tf__pageItem');
 
     vm.setPageItemEvent();
   }
