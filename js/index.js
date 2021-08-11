@@ -95,9 +95,7 @@ class TravelFood {
    */
   setPageItemEvent() {
     let vm = this;
-    // const pageItemDOM = [...vm.pageItems];
-    const paginationDOM = vm.pagination;
-    
+    const pageItemDOM = [...vm.pageItems];
     pageItemDOM.forEach(element => {
       element.addEventListener('click', function(){
         let currentPageNumber = vm.getCurrentPage();
@@ -113,6 +111,11 @@ class TravelFood {
         }
       });
     });
+    
+    // const paginationDOM = vm.pagination;
+    // paginationDOM.addEventListener((e)=>{
+    //   //....
+    // })
   }
 
   /**
