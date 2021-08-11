@@ -4,7 +4,8 @@ class TravelFood {
       currentPage: 0, //目前頁碼
       totalPage: 0, //總頁數
       pageSize: 10, //每頁呈現的資料列
-      travelFood: [], //呈現的資料來源(原始資料)
+      travelFood: [], //原始資料
+      showFood:[] //呈現的資料
     };
     this.init();
   }
@@ -49,6 +50,21 @@ class TravelFood {
   }
 
   /**
+   * 取得已整理的小吃資料
+   * @returns 已整理的小吃資料
+   */
+  getSortFoodData() {
+    return this.pageObject.showFood;
+  }
+
+  /**
+   * 儲存已整理的小吃資料
+   */
+  setSortFoodData(value) {
+    this.pageObject.showFood = value;
+  }
+
+  /**
    * 設定目前頁碼與列表
    * @param {number} targetPage
    */
@@ -78,8 +94,9 @@ class TravelFood {
    */
   setPageItemEvent() {
     let vm = this;
-    const pageItemDOM = vm.pageItems;
-    for (let element of pageItemDOM) {
+    const pageItemDOM = [...vm.pageItems];
+
+    pageItemDOM.forEach(element => {
       element.addEventListener('click', function () {
         document
           .getElementsByClassName('js-tf__pageItem')[0]
@@ -90,7 +107,7 @@ class TravelFood {
           vm.setCurrentPage(pageNumber);
         }
       });
-    }
+    });
   }
 
   /**
@@ -98,20 +115,53 @@ class TravelFood {
    */
   renderPagination() {
     let vm = this;
-    let totalPage = this.getTotalPage();
     let template = '';
-    let i = 0;
-    while (i < totalPage) {
-      i += 1;
+    let len = vm.getTravelFoodData().length;
+    let pageSize = vm.getPageSize();
+    vm.setTotalPage(Math.ceil(len / pageSize));
+    
+    let totalPage = vm.getTotalPage();
+
+    for (let i = 1; i <= totalPage; i += 1) {
       if (i === 1) {
         template += `<li class='text-center tf__pageItem js-tf__pageItem' data-page-number='${i}'>${i}</li>`;
-        continue;
-      } 
-      template += `<li class='text-center tf__pageItem' data-page-number='${i}'>${i}</li>`;
+      } else {
+        template += `<li class='text-center tf__pageItem' data-page-number='${i}'>${i}</li>`;
+      }
     }
+
     vm.pagination.innerHTML = template;
     vm.pageItems = document.getElementsByClassName('tf__pageItem');
+    vm.setPageItemEvent();
   }
+
+  /**
+   * 整理資料為二維陣列
+   */
+  sortData() {
+    let vm =this;
+    let pageSize = vm.getPageSize();
+    let travelFoodData = vm.getTravelFoodData();
+    let count = 0;
+    let tmpArr = [];
+    let sortArr = [];
+
+    travelFoodData.forEach((foodData, index) => {
+      count += 1;
+      tmpArr.push(foodData);
+      if (count % pageSize == 0) {
+        sortArr.push(tmpArr);
+        tmpArr = [];
+      }
+      //不滿pageSize的資料
+      if (count % pageSize != 0 &&  index === travelFoodData.length -1) {
+        sortArr.push(tmpArr);
+      }
+    });
+
+    vm.setSortFoodData(sortArr);
+    return sortArr;
+  };
 
   /**
    * 渲染表格
@@ -119,15 +169,18 @@ class TravelFood {
   renderTable() {
     let vm = this;
     let tableTemplate = '';
-    let travelFoodData = vm.getTravelFoodData();
     let currentPage = vm.getCurrentPage() - 1;
     let pageSize = vm.getPageSize();
-    let currentData = travelFoodData[currentPage];
     let previewImageAlignBottomIndex = pageSize - 2; //預覽圖片最後兩張空間靠下
 
-    currentData.forEach((foodData, index) => {
+    //如果沒有整理過的資料，才做整理，不然取用已經整理好的
+    let sortFoodData = vm.getSortFoodData();
+    if (sortFoodData.length === 0){
+      sortFoodData = vm.sortData();
+    }
+    
+    sortFoodData[currentPage].forEach((foodData, index) => {
       let currentDataIndex = currentPage * pageSize + index + 1; //目前資料在總資料的index
-
       if (index % 2) {
         tableTemplate += `<tr class='tf__row'>`;
       } else {
@@ -135,33 +188,32 @@ class TravelFood {
       }
 
       tableTemplate += `<td class='tf__td text-secondary text-center' title='${currentDataIndex}'>${currentDataIndex}</td>
-						<td class='tf__td text-center' title='${foodData.City}'>${foodData.City}</td>
-						<td class='tf__td' title='${foodData.Name}'>
-							<div class='inner__image'>
-								<img class='tf__image' src='${foodData.PicURL}' loading='lazy' width='80' height='50' alt='${foodData.Name}'>
-								<div class='inner__preview 
+            <td class='tf__td text-center' title='${foodData.City}'>${foodData.City}</td>
+            <td class='tf__td' title='${foodData.Name}'>
+              <div class='inner__image'>
+                <img class='tf__image' src='${foodData.PicURL}' loading='lazy' width='80' height='50' alt='${foodData.Name}'>
+                <div class='inner__preview 
                 ${index >= previewImageAlignBottomIndex
                     ? 'inner__preview-bottom'
                     : ''}'>
-									<img class='tf__previmage' src='${foodData.PicURL}' width='280' height='190' alt='${foodData.Name}'>
-								</div>
-							</div>
-						</td>
-						<td class='tf__td tf__td-name' title='${foodData.Name}'>
-							${foodData.Url
+                  <img class='tf__previmage' src='${foodData.PicURL}' width='280' height='190' alt='${foodData.Name}'>
+                </div>
+              </div>
+            </td>
+            <td class='tf__td tf__td-name' title='${foodData.Name}'>
+              ${foodData.Url
                   ? `<a class='text__link' href=${foodData.Url} target='_blank' title='${foodData.Name}'>${foodData.Name}</a>`
                   : foodData.Name}
-						</td>
-						<td class='tf__td' title='${foodData.HostWords}'>
-							${
+            </td>
+            <td class='tf__td' title='${foodData.HostWords}'>
+              ${
                 foodData.HostWords.length < 50
                   ? foodData.HostWords
                   : foodData.HostWords.slice(0, 50) + '...'
               }
-				</td>
-			</tr>`;
+        </td>
+      </tr>`;
     });
-
     vm.travelFoodList.innerHTML = tableTemplate;
   }
 
@@ -174,19 +226,8 @@ class TravelFood {
     fetch('https://data.coa.gov.tw/Service/OpenData/ODwsv/ODwsvTravelFood.aspx')
       .then((response) => response.json())
       .then((foodData) => {
-        let len = foodData.length;
-        let pageSize = vm.getPageSize();
-        vm.setTotalPage(Math.ceil(len / pageSize));
-        //整理資料為二維陣列
-        let sortData = [];
-        let index = 0;
-        while (index <= len) {
-          sortData.push(foodData.splice(0, pageSize));
-          index += pageSize;
-        }
-        vm.setTravelFood(sortData);
+        vm.setTravelFood(foodData);
         vm.renderPagination();
-        vm.setPageItemEvent();
         vm.setCurrentPage(1); //取完資料設定第一頁
         document.getElementById('Pagination').classList.remove('js-hidden');
       })
