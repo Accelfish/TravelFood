@@ -27,10 +27,6 @@ body {
   display: flex;
 }
 
-.container__row--stack{
-  flex-direction: column;
-}
-
 .tf__col--main{
   width: 830px;
   margin-right: 30px;
@@ -112,7 +108,7 @@ body {
   color: #888;
 }
 
-.tf__pageItem--active {
+.js-tf__pageItem {
   font-weight: 700;
   margin-right: -3px;/*處理邊線*/
   border-right:  3px solid #0076B4;
