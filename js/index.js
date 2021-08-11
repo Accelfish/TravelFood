@@ -5,7 +5,7 @@ class TravelFood {
       totalPage: 0, //總頁數
       pageSize: 10, //每頁呈現的資料列
       travelFood: [], //原始資料
-      showFood:[] //呈現的資料
+      showFood:[], //呈現的資料
     };
     this.init();
   }
@@ -51,14 +51,15 @@ class TravelFood {
 
   /**
    * 取得已整理的小吃資料
-   * @returns 已整理的小吃資料
+   * @returns 已儲存的小吃資料
    */
   getSortFoodData() {
     return this.pageObject.showFood;
   }
 
   /**
-   * 儲存已整理的小吃資料
+   * 取得已整理的小吃資料
+   * @returns 已儲存的小吃資料
    */
   setSortFoodData(value) {
     this.pageObject.showFood = value;
@@ -94,17 +95,21 @@ class TravelFood {
    */
   setPageItemEvent() {
     let vm = this;
-    const pageItemDOM = [...vm.pageItems];
-
+    // const pageItemDOM = [...vm.pageItems];
+    const paginationDOM = vm.pagination;
+    
     pageItemDOM.forEach(element => {
-      element.addEventListener('click', function () {
-        document
-          .getElementsByClassName('js-tf__pageItem')[0]
-          .classList.remove('js-tf__pageItem');
-        this.classList.add('js-tf__pageItem');
-        let pageNumber = parseInt(element.dataset.pageNumber);
-        if (pageNumber) {
-          vm.setCurrentPage(pageNumber);
+      element.addEventListener('click', function(){
+        let currentPageNumber = vm.getCurrentPage();
+        let targetPageNumber = parseInt(this.dataset.pageNumber, 10);
+        if (targetPageNumber) {
+          if(targetPageNumber !== currentPageNumber){
+            paginationDOM
+              .getElementsByClassName('js-tf__pageItem')[0]
+              .classList.remove('js-tf__pageItem');
+            this.classList.add('js-tf__pageItem');
+            vm.setCurrentPage(targetPageNumber);
+          }
         }
       });
     });
@@ -131,7 +136,8 @@ class TravelFood {
     }
 
     vm.pagination.innerHTML = template;
-    vm.pageItems = document.getElementsByClassName('tf__pageItem');
+    vm.pageItems = vm.pagination.querySelectorAll('tf__pageItem');
+
     vm.setPageItemEvent();
   }
 
@@ -169,6 +175,7 @@ class TravelFood {
   renderTable() {
     let vm = this;
     let tableTemplate = '';
+    let descLimitLength = 50;
     let currentPage = vm.getCurrentPage() - 1;
     let pageSize = vm.getPageSize();
     let previewImageAlignBottomIndex = pageSize - 2; //預覽圖片最後兩張空間靠下
@@ -207,9 +214,9 @@ class TravelFood {
             </td>
             <td class='tf__td' title='${foodData.HostWords}'>
               ${
-                foodData.HostWords.length < 50
+                foodData.HostWords.length < descLimitLength
                   ? foodData.HostWords
-                  : foodData.HostWords.slice(0, 50) + '...'
+                  : foodData.HostWords.slice(0, descLimitLength) + '...'
               }
         </td>
       </tr>`;
@@ -229,7 +236,7 @@ class TravelFood {
         vm.setTravelFood(foodData);
         vm.renderPagination();
         vm.setCurrentPage(1); //取完資料設定第一頁
-        document.getElementById('Pagination').classList.remove('js-hidden');
+        vm.pagination.classList.remove('js-hidden');
       })
       .catch((error) => {
         console.error(error);

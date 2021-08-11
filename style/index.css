@@ -112,6 +112,7 @@ body {
   font-weight: 700;
   margin-right: -3px;/*處理邊線*/
   border-right:  3px solid #0076B4;
+  cursor:default;
   color: #666;
 }
 
